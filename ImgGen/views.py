@@ -22,7 +22,7 @@ def home(request):
         # data = str(input("Enter description of your Image: "))
         # Set up our initial generation parameters.
         answers = stability_api.generate(
-            prompt="20 yrs old girl",
+            prompt="deamon car with black metallic color",
             seed=1590788272, 
             steps=30, 
             cfg_scale=8.0, 
@@ -38,7 +38,7 @@ def home(request):
                     warnings.warn(
                         "Your request activated the API's safety filters and could not be processed."
                         "Please modify the prompt and try again.")
-                    break
+                    return render(request, 'errorPage.html',{'msg':"Censored content are not allowed!!"})
                 if artifact.type == generation.ARTIFACT_IMAGE:
                     img = Image.open(io.BytesIO(artifact.binary))
                     img.save("./static/img/"+str(artifact.seed)+ ".png")
@@ -57,4 +57,4 @@ def home(request):
         # Add the images and img_tags variables to the template context
         return render(request, 'home.html',{ 'img_tags': img_tags})
     except:
-        return render(request, 'errorPage.html')
+        return render(request, 'errorPage.html', {'msg':"Something went off!!"})
