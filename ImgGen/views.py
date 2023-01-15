@@ -11,47 +11,50 @@ from stability_sdk import client
 import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 
 def home(request):
-    # answers = api_work()
-    stability_api = client.StabilityInference(
-            key=os.environ['STABILITY_KEY'], # API Key reference.
-            verbose=True, # Print debug messages.
-            engine="stable-diffusion-v1-5",
+    try:
+        # answers = api_work()
+        stability_api = client.StabilityInference(
+                key=os.environ['STABILITY_KEY'], # API Key reference.
+                verbose=True, # Print debug messages.
+                engine="stable-diffusion-v1-5",
+            )
+        number = random.randint(0, 2147483647)
+        # data = str(input("Enter description of your Image: "))
+        # Set up our initial generation parameters.
+        answers = stability_api.generate(
+            prompt="20 yrs old girl",
+            seed=1590788272, 
+            steps=30, 
+            cfg_scale=8.0, 
+            width=512,
+            height=512,
+            samples=1, # Number of images to generate, defaults to 1 if not included.
+            sampler=generation.SAMPLER_K_DPMPP_2M                                       
         )
-    number = random.randint(0, 2147483647)
-    # data = str(input("Enter description of your Image: "))
-    # Set up our initial generation parameters.
-    answers = stability_api.generate(
-        prompt="stunning jordan sneaker",
-        seed=number, 
-        steps=30, 
-        cfg_scale=8.0, 
-        width=512, # Generation width, defaults to 512 if not included.
-        height=512, # Generation height, defaults to 512 if not included.
-        samples=1, # Number of images to generate, defaults to 1 if not included.
-        sampler=generation.SAMPLER_K_DPMPP_2M                                       
-    )
-    
-    for resp in answers:
-        for artifact in resp.artifacts:
-            if artifact.finish_reason == generation.FILTER:
-                warnings.warn(
-                    "Your request activated the API's safety filters and could not be processed."
-                    "Please modify the prompt and try again.")
-                break
-            if artifact.type == generation.ARTIFACT_IMAGE:
-                img = Image.open(io.BytesIO(artifact.binary))
-                img.save("./static/assets/"+str(artifact.seed)+ ".png")
-    images = os.listdir('./static/assets/')
-    # Generate the img tags for each image
-    import base64
-    img_tags = []
-    img_tags = []
-    for image in images:
-        with open('./static/assets/' + image, 'rb') as f:
-            image_data = f.read()
-            image_data_base64 = base64.b64encode(image_data).decode('utf-8')
-            img_tag = '<img src="data:image/png;base64,{}">'.format(image_data_base64)
-            img_tags.append(img_tag)
-    
-    # Add the images and img_tags variables to the template context
-    return render(request, 'home.html',{ 'img_tags': img_tags})
+        
+        for resp in answers:
+            for artifact in resp.artifacts:
+                if artifact.finish_reason == generation.FILTER:
+                    warnings.warn(
+                        "Your request activated the API's safety filters and could not be processed."
+                        "Please modify the prompt and try again.")
+                    break
+                if artifact.type == generation.ARTIFACT_IMAGE:
+                    img = Image.open(io.BytesIO(artifact.binary))
+                    img.save("./static/img/"+str(artifact.seed)+ ".png")
+        images = os.listdir('./static/img/')
+        # Generate the img tags for each image
+        import base64
+        img_tags = []
+        img_tags = []
+        for image in images:
+            with open('./static/img/' + image, 'rb') as f:
+                image_data = f.read()
+                image_data_base64 = base64.b64encode(image_data).decode('utf-8')
+                img_tag = '<img src="data:image/png;base64,{}">'.format(image_data_base64)
+                img_tags.append(img_tag)
+        
+        # Add the images and img_tags variables to the template context
+        return render(request, 'home.html',{ 'img_tags': img_tags})
+    except:
+        return render(request, 'errorPage.html')
