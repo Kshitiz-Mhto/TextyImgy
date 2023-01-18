@@ -22,7 +22,7 @@ def home(request):
         # data = str(input("Enter description of your Image: "))
         # Set up our initial generation parameters.
         answers = stability_api.generate(
-            prompt="deamon car with black metallic color",
+            prompt="NIKE sneaker",
             seed=1590788272, 
             steps=30, 
             cfg_scale=8.0, 
