@@ -12,6 +12,12 @@
   </head>
 
   <body>
+    <header id ="header">
+      <button id="headerButton" class="button">
+        <span>Let's Go  </span>
+      </button>
+    </header>
+
     <div class="container1">
         {% for img_tag in img_tags %}
             {% comment %} <h2>{{ image.name }}</h2> {% endcomment %}
@@ -20,7 +26,7 @@
             </div>
         {% endfor %}
     </div>
-
+    <script type="text/javascript" src="{% static 'main.js' %}"></script>
   </body>
 
 </html>
